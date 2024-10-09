@@ -1,0 +1,14 @@
+name: Man10Trophy
+version: '1.0'
+main: yusama125718.man10Trophy.Man10Trophy
+api-version: '1.20'
+
+commands:
+  mtro:
+    description: Man10Trophy
+
+permissions:
+  mtro.op:
+    default: op
+  mtro.player:
+    default: true
