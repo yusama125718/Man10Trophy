@@ -27,12 +27,14 @@ public class Command implements CommandExecutor, TabCompleter {
                     sender.sendMessage(Component.text(prefix + "トロフィーが1つも登録されていません"));
                     return true;
                 }
-                GUI.OpenMenu((Player) sender, false);
+                GUI.OpenMenu((Player) sender, false, 1);
                 return true;
 
             case 1:
                 if(args[0].equals("help")){
                     sender.sendMessage(Component.text(prefix + "§8/mtro §7: §rトロフィー交換メニューを開きます"));
+                    sender.sendMessage(Component.text(prefix + "§8/mtro title [タイトル] §7: §r手に持っているトロフィーのアイテム名を編集します（自身が発行した物のみ）"));
+                    sender.sendMessage(Component.text(prefix + "§8/mtro lore [行番号] [内容] §7: §r手に持っているトロフィーの説明を編集します。:blankで空行を設定（自身が発行した物のみ）"));
                     if (sender.hasPermission("mtro.op")){
                         sender.sendMessage(Component.text(prefix + "§8/mtro [on/off] §7: §rシステムを[起動/停止]します"));
                         sender.sendMessage(Component.text(prefix + "§8/mtro create [内部名] §7: §rトロフィー交換メニューを開きます"));
@@ -67,10 +69,23 @@ public class Command implements CommandExecutor, TabCompleter {
                         sender.sendMessage(Component.text(prefix + "トロフィーが1つも登録されていません"));
                         return true;
                     }
-                    GUI.OpenEditMenu((Player) sender, true);
+                    GUI.OpenMenu((Player) sender, true, 1);
                     return true;
                 }
+                break;
 
+            case 2:
+                if (sender.hasPermission("mtro.op") && args[0].equals("create")){
+                    for(Trophy t: trophies){
+                        if(t.name.equals(args[1])){
+                            sender.sendMessage(Component.text(prefix + args[1] + "は既に存在しています"));
+                            return true;
+                        }
+                    }
+                    GUI.OpenCreateGUI((Player) sender, args[1]);
+                    return true;
+                }
+                break;
         }
         sender.sendMessage(Component.text(prefix + "/mtro help でhelpを表示"));
         return true;
@@ -78,7 +93,7 @@ public class Command implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (!sender.hasPermission("mserial.p")) return null;
+        if (!sender.hasPermission("mtro.p")) return null;
         return null;
     }
 }

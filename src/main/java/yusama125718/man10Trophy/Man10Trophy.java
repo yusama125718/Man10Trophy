@@ -23,8 +23,11 @@ public final class Man10Trophy extends JavaPlugin {
     @Override
     public void onEnable() {
         trophy = this;
+        new Event(this);
         getCommand("mtro").setExecutor(new Command());
         SetupPL();
+        MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
+        mysql.execute("create table if not exists man10_trophy_data(id int auto_increment,time varchar(35),trophy_name varchar(20),mcid varchar(16),uuid varchar(36),primary key(id))");
     }
 
     // setup
@@ -54,11 +57,11 @@ public final class Man10Trophy extends JavaPlugin {
         if (configfile.listFiles() != null){
             for (File file : configfile.listFiles()){
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-                if (config.isItemStack("item") || config.isItemStack("cost") || config.isItemStack("display") || config.isInt("score") || config.isBoolean("state")){
+                if (config.isItemStack("item") || config.isItemStack("cost") || config.isItemStack("display") || config.isInt("score") || config.isBoolean("state") || config.isString("name")){
                     Bukkit.broadcast(Component.text(prefix + file.getName() + "の読み込みに失敗しました"), "mtro.op");
                     continue;
                 }
-                trophies.add(new Trophy(config.getItemStack("item"), config.getItemStack("cost"), config.getItemStack("display"), config.getInt("score"), config.getBoolean("state")));
+                trophies.add(new Trophy(config.getItemStack("item"), config.getItemStack("cost"), config.getItemStack("display"), config.getInt("score"), config.getBoolean("state"), config.getString("name")));
             }
         }
     }
@@ -71,13 +74,15 @@ public final class Man10Trophy extends JavaPlugin {
         public Integer score;
         // 販売中か
         public Boolean state;
+        public String name;
 
-        public Trophy(ItemStack ITEM, ItemStack COST, ItemStack DISPLAY, Integer SCORE, Boolean STATE){
+        public Trophy(ItemStack ITEM, ItemStack COST, ItemStack DISPLAY, Integer SCORE, Boolean STATE, String NAME){
             item = ITEM;
             cost = COST;
             display = DISPLAY;
             score = SCORE;
             state = STATE;
+            name = NAME;
         }
     }
 }
