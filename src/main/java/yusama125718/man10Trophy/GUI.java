@@ -72,8 +72,9 @@ public class GUI {
     }
 
 
-    public static void OpenEditMenu(Player p, Man10Trophy.Trophy t){
-        Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10Trophy] 編集画面 " + t.name));
+    public static void OpenEditMenu(Player p, Integer id){
+        Man10Trophy.Trophy t = trophies.get(id);
+        Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10Trophy] 編集画面 " + id));
         for (int i = 0; i < 36; i++){
             switch (i){
                 // 戻る
@@ -125,9 +126,6 @@ public class GUI {
                     inv.setItem(i, GetItem(Material.ITEM_FRAME, "アイコンを編集する", 1));
                     break;
 
-                case 30:
-
-
                 default:
                     inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "",1));
                     break;
@@ -169,7 +167,45 @@ public class GUI {
         p.openInventory(inv);
     }
 
-    private static ItemStack GetItem(Material mate, String name, Integer cmd){
+    // mode = <display/cost/item>
+    public static void OpenEditItemGUI(Player p, Integer id, String mode){
+        Man10Trophy.Trophy t = trophies.get(id);
+        Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10TrophyEdit] アイテム編集 " + mode + " " + id ));
+        for (int i = 0; i < 36; i++){
+            switch (i){
+                // 戻る
+                case 0:
+                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "戻る",1));
+                    break;
+
+                // アイテムスロット
+                case 12:
+                    ItemStack item;
+                    if (mode.equals("display")) item = t.display;
+                    else if (mode.equals("cost")) item = t.cost;
+                    else item = t.item;
+                    inv.setItem(i, item);
+                    break;
+
+                case 15:
+                    inv.setItem(i, GetItem(Material.RED_STAINED_GLASS_PANE, "コマンドを表示",1));
+                    break;
+
+                // 決定ボタン
+                case 30:
+                    inv.setItem(i, GetItem(Material.EMERALD_BLOCK, "保存", 1));
+                    break;
+
+                default:
+                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "",1));
+                    break;
+            }
+
+        }
+        p.openInventory(inv);
+    }
+
+    public static ItemStack GetItem(Material mate, String name, Integer cmd){
         ItemStack item = new ItemStack(mate, 1);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text(name));

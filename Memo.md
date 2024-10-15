@@ -9,11 +9,14 @@
 ## GUI
 
 * [Man10Trophy] 編集メニュー <page>
+  * done
 * [Man10Trophy] メインメニュー <page>
+  * done
 * [Man10Trophy] 交換画面 <id>
+  * done
 * [Man10Trophy] 編集画面 <id>
 * [Man10TrophyEdit] 新規作成 <id>
-* [Man10TrophyEdit] アイテム編集 <id>
+* [Man10TrophyEdit] アイテム編集 <display/cost/item> <id>
 
 ## トロフィーデータ
 
