@@ -15,8 +15,13 @@
 * [Man10Trophy] 交換画面 <id>
   * done
 * [Man10Trophy] 編集画面 <id>
+  * done
 * [Man10TrophyEdit] 新規作成 <id>
 * [Man10TrophyEdit] アイテム編集 <display/cost/item> <id>
+
+## その他処理
+
+* 右クリック時編集コマンド表示処理
 
 ## トロフィーデータ
 
@@ -27,7 +32,7 @@
 * display
   * 一覧用アイテム
 * name
-  * 内部名
+  * 内部名(ファイル名)
 * score
   * 必要スコア
 * state

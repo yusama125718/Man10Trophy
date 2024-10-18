@@ -57,11 +57,11 @@ public final class Man10Trophy extends JavaPlugin {
         if (configfile.listFiles() != null){
             for (File file : configfile.listFiles()){
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-                if (config.isItemStack("item") || config.isItemStack("cost") || config.isItemStack("display") || config.isInt("score") || config.isBoolean("state") || config.isString("name")){
+                if (config.isItemStack("item") || config.isItemStack("cost") || config.isItemStack("display") || config.isInt("score") || config.isBoolean("state")){
                     Bukkit.broadcast(Component.text(prefix + file.getName() + "の読み込みに失敗しました"), "mtro.op");
                     continue;
                 }
-                trophies.add(new Trophy(config.getItemStack("item"), config.getItemStack("cost"), config.getItemStack("display"), config.getInt("score"), config.getBoolean("state"), config.getString("name")));
+                trophies.add(new Trophy(config.getItemStack("item"), config.getItemStack("cost"), config.getItemStack("display"), config.getInt("score"), config.getBoolean("state"), folder.getName()));
             }
         }
     }

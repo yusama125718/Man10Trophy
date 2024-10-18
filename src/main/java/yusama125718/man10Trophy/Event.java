@@ -3,14 +3,17 @@ package yusama125718.man10Trophy;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.io.File;
 import java.time.LocalDateTime;
 
 import static java.lang.Integer.parseInt;
@@ -136,11 +139,48 @@ public class Event implements Listener {
                         target.state = false;
                         e.getInventory().setItem(31, GUI.GetItem(Material.REDSTONE_BLOCK, "交換停止中 [クリックで交換開始]", 1));
                     }
+                    else {
+                        target.state = true;
+                        e.getInventory().setItem(31, GUI.GetItem(Material.EMERALD_BLOCK, "交換中 [クリックで交換停止]", 1));
+                    }
+                    YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(configfile.getAbsoluteFile() + File.separator + target.name));
+                    config.set("state", target.state);
+                    e.getWhoClicked().sendMessage(Component.text(prefix + "販売状態を変更しました。現在の状態：" + target.state));
+                    return;
                 }
             }
         }
         else if (e.getView().title().toString().startsWith("[Man10TrophyEdit]")){
+            if (title.startsWith("[Man10TrophyEdit] 新規作成 ")){
+                String name = title.substring(23);
+                switch (e.getRawSlot()){
+                    case 11, 15:
+                        return;
 
+                    case 31:
+                        e.setCancelled(true);
+                        Inventory inv = e.getInventory();
+                        if (inv.getItem(11) == null || inv.getItem(15) == null){
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "アイテムが不足しています！"));
+                            return;
+                        }
+                        File folder = new File(configfile.getAbsolutePath() + File.separator + name + ".yml");
+                        YamlConfiguration yml = new YamlConfiguration();
+                        yml.set("name", name);
+                        yml.set("cost", inv.getItem(11));
+                        yml.set("item", inv.getItem(15));
+                        yml.set("display", inv.getItem(15));
+                        yml.set("score", 0);
+                        yml.set("state", false);
+                        yml.save(folder);
+                        trophies.add(new Trophy(inv.getItem(15), inv.getItem(11), inv.getItem(15), 0, false, name));
+                        return;
+
+                    default:
+                        e.setCancelled(true);
+                        return;
+                }
+            }
         }
     }
 }
