@@ -17,6 +17,7 @@ public final class Man10Trophy extends JavaPlugin {
     public static String prefix;
     public static List<Trophy> trophies;
     public static File configfile;
+    public static String editor;
 
     private static final File folder = new File(trophy.getDataFolder().getAbsolutePath() + File.separator + "trophy");
 

@@ -69,6 +69,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         sender.sendMessage(Component.text(prefix + "トロフィーが1つも登録されていません"));
                         return true;
                     }
+                    editor = sender.getName();
                     GUI.OpenMenu((Player) sender, true, 1);
                     return true;
                 }
@@ -82,6 +83,7 @@ public class Command implements CommandExecutor, TabCompleter {
                             return true;
                         }
                     }
+                    editor = sender.getName();
                     GUI.OpenCreateGUI((Player) sender, args[1]);
                     return true;
                 }

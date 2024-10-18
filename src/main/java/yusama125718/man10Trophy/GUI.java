@@ -38,7 +38,7 @@ public class GUI {
             switch (i){
                 // 戻る
                 case 0:
-                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "戻る",1));
+                    inv.setItem(i, GetItem(Material.BLACK_STAINED_GLASS_PANE, "戻る",1));
                     break;
 
                 // 交換元
@@ -79,7 +79,7 @@ public class GUI {
             switch (i){
                 // 戻る
                 case 0:
-                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "戻る",1));
+                    inv.setItem(i, GetItem(Material.BLACK_STAINED_GLASS_PANE, "戻る",1));
                     break;
 
                 // 交換元
@@ -126,6 +126,11 @@ public class GUI {
                     inv.setItem(i, GetItem(Material.ITEM_FRAME, "アイコンを編集する", 1));
                     break;
 
+                // delete
+                case 35:
+                    inv.setItem(i, GetItem(Material.RED_STAINED_GLASS, "削除する", 1));
+                    break;
+
                 default:
                     inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "",1));
                     break;
@@ -141,7 +146,7 @@ public class GUI {
             switch (i){
                 // 戻る
                 case 0:
-                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "戻る",1));
+                    inv.setItem(i, GetItem(Material.BLACK_STAINED_GLASS_PANE, "戻る",1));
                     break;
 
                 // 交換元、交換先
@@ -175,7 +180,7 @@ public class GUI {
             switch (i){
                 // 戻る
                 case 0:
-                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "戻る",1));
+                    inv.setItem(i, GetItem(Material.BLACK_STAINED_GLASS_PANE, "戻る",1));
                     break;
 
                 // アイテムスロット
@@ -194,6 +199,29 @@ public class GUI {
                 // 決定ボタン
                 case 30:
                     inv.setItem(i, GetItem(Material.EMERALD_BLOCK, "保存", 1));
+                    break;
+
+                default:
+                    inv.setItem(i, GetItem(Material.WHITE_STAINED_GLASS_PANE, "",1));
+                    break;
+            }
+
+        }
+        p.openInventory(inv);
+    }
+
+    public static void OpenDeleteGUI(Player p, int id){
+        Man10Trophy.Trophy t = trophies.get(id);
+        Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10Trophy] トロフィー削除 " + id ));
+        for (int i = 0; i < 36; i++){
+            switch (i){
+                // 戻る
+                case 2:
+                    inv.setItem(i, GetItem(Material.RED_STAINED_GLASS_PANE, "削除",1));
+                    break;
+
+                case 6:
+                    inv.setItem(i, GetItem(Material.BLUE_STAINED_GLASS_PANE, "キャンセル",1));
                     break;
 
                 default:

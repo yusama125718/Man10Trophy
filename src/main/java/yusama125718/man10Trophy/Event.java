@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,9 +15,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import static java.lang.Integer.parseInt;
+import static net.kyori.adventure.text.event.ClickEvent.suggestCommand;
 import static yusama125718.man10Trophy.Man10Trophy.*;
 
 public class Event implements Listener {
@@ -25,9 +29,13 @@ public class Event implements Listener {
     }
 
     @EventHandler
-    public void GUIClick(InventoryClickEvent e){
+    public void GUIClick(InventoryClickEvent e) throws IOException {
         String title = e.getView().toString();
         if (title.startsWith("[Man10Trophy]")){
+            if (e.getClick().equals(ClickType.NUMBER_KEY) || e.getClick().equals(ClickType.SWAP_OFFHAND)){
+                e.setCancelled(true);
+                return;
+            }
             e.setCancelled(true);
             if (title.startsWith("[Man10Trophy] メインメニュー ")){
                 if (!system){
@@ -143,14 +151,46 @@ public class Event implements Listener {
                         target.state = true;
                         e.getInventory().setItem(31, GUI.GetItem(Material.EMERALD_BLOCK, "交換中 [クリックで交換停止]", 1));
                     }
-                    YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(configfile.getAbsoluteFile() + File.separator + target.name));
+                    File file = new File(configfile.getAbsoluteFile() + File.separator + target.name);
+                    YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
                     config.set("state", target.state);
+                    config.save(file);
                     e.getWhoClicked().sendMessage(Component.text(prefix + "販売状態を変更しました。現在の状態：" + target.state));
+                    return;
+                }
+                else if (e.getRawSlot() == 35){
+                    e.getWhoClicked().closeInventory();
+                    GUI.OpenDeleteGUI((Player) e.getWhoClicked(), id);
+                    return;
+                }
+            }
+            else if (title.startsWith("[Man10Trophy] トロフィー削除 ")){
+                int id = parseInt(title.substring(22));
+                Man10Trophy.Trophy target = trophies.get(id);
+                if (e.getRawSlot() == 2){
+                    if (new File(configfile + File.separator + target.name).delete()){
+                        trophies.remove(target);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "削除しました"));
+                    }
+                    else {
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "削除に失敗しました"));
+                    }
+                    return;
+                }
+                else if (e.getRawSlot() == 6){
+                    e.getWhoClicked().closeInventory();
+                    GUI.OpenEditMenu((Player) e.getWhoClicked(), id);
                     return;
                 }
             }
         }
         else if (e.getView().title().toString().startsWith("[Man10TrophyEdit]")){
+            if (e.getClick().equals(ClickType.NUMBER_KEY) || e.getClick().equals(ClickType.SWAP_OFFHAND)){
+                e.setCancelled(true);
+                return;
+            }
             if (title.startsWith("[Man10TrophyEdit] 新規作成 ")){
                 String name = title.substring(23);
                 switch (e.getRawSlot()){
@@ -166,7 +206,6 @@ public class Event implements Listener {
                         }
                         File folder = new File(configfile.getAbsolutePath() + File.separator + name + ".yml");
                         YamlConfiguration yml = new YamlConfiguration();
-                        yml.set("name", name);
                         yml.set("cost", inv.getItem(11));
                         yml.set("item", inv.getItem(15));
                         yml.set("display", inv.getItem(15));
@@ -174,6 +213,48 @@ public class Event implements Listener {
                         yml.set("state", false);
                         yml.save(folder);
                         trophies.add(new Trophy(inv.getItem(15), inv.getItem(11), inv.getItem(15), 0, false, name));
+                        return;
+
+                    default:
+                        e.setCancelled(true);
+                        return;
+                }
+            }
+            else if (e.getView().title().toString().startsWith("[Man10TrophyEdit] アイテム編集 display ")){
+                int id = parseInt(title.substring(33));
+                Man10Trophy.Trophy target = trophies.get(id);
+                switch(e.getRawSlot()){
+                    case 0:
+                        e.setCancelled(true);
+                        e.getWhoClicked().closeInventory();
+                        GUI.OpenMenu((Player) e.getWhoClicked(), true, id / 45);
+                        return;
+
+                    case 12:
+                        return;
+
+                    case 15:
+                        e.setCancelled(true);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "アイテム名を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor display "+ id +" ")));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[内容]を入力で編集"));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "アイテム説明を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor lore display "+ id +" ")));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[行番号 内容]を入力で編集"));
+                        return;
+
+                    case 30:
+                        e.setCancelled(true);
+                        if (e.getInventory().getItem(12) == null){
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "アイテムが不足しています"));
+                            return;
+                        }
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("display", e.getInventory().getItem(12));
+                        config.save(file);
+                        target.cost = e.getInventory().getItem(12);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "変更しました"));
                         return;
 
                     default:
