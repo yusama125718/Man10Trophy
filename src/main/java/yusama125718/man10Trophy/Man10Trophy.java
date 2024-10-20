@@ -19,11 +19,12 @@ public final class Man10Trophy extends JavaPlugin {
     public static File configfile;
     public static String editor;
 
-    private static final File folder = new File(trophy.getDataFolder().getAbsolutePath() + File.separator + "trophy");
+    private static File folder;
 
     @Override
     public void onEnable() {
         trophy = this;
+        folder = new File(trophy.getDataFolder().getAbsolutePath() + File.separator + "trophy");
         new Event(this);
         getCommand("mtro").setExecutor(new Command());
         SetupPL();
@@ -33,7 +34,7 @@ public final class Man10Trophy extends JavaPlugin {
 
     // setup
     private void SetupPL(){
-        saveDefaultConfig();
+        trophy.saveDefaultConfig();
         prefix = trophy.getConfig().getString("prefix");
         system = trophy.getConfig().getBoolean("system");
         // create trophy folder

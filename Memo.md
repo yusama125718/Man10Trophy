@@ -22,12 +22,13 @@
   * done
 * [Man10TrophyEdit] アイテム編集 <display/cost/item> <id>
   * delete => done
-  * cost
-  * item
+  * cost => done
+  * item => done
 
 ## その他処理
 
 * 右クリック時編集コマンド表示処理
+  * done
 
 ## トロフィーデータ
 
@@ -57,7 +58,9 @@
 * /mtro : トロフィー交換メニューを開く
   * done
 * /mtro title [タイトル] : 手に持っているトロフィーのアイテム名を編集（自身が発行した物のみ）
+  * done
 * /mtro lore [行番号] [内容] : 手に持っているトロフィーの説明を編集。:blankで空行を設定（自身が発行した物のみ）
+  * done
 * /mtro [on/off] : システムを[起動/停止]
   * done
 * /mtro create [内部名] : トロフィー追加メニューを開く
@@ -65,9 +68,22 @@
 * /mtro edit : トロフィー編集メニューを開く
   * done
 * /mtro editor [display/item/cost] [id] [内容] : トロフィーのアイテム名を編集
-* /mtro editor lore [display/item/cost] [id] [行] [内容] : トロフィーのアイテム名を編集
+  * display
+    * done
+  * item
+    * done
+  * cost
+    * done
+* /mtro editor lore [display/item/cost] [id] [行] [内容] : トロフィーの説明を編集
+  * display
+    * done
+  * item
+  * cost
 * /mtro editor score [id] [score] : 要求スコアを設定
+  * done
 
 ## TODO
 
 * スコア判定処理を追加
+  * done
+* TAB補完の追加

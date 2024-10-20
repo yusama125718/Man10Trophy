@@ -1,15 +1,26 @@
 package yusama125718.man10Trophy;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
 import static yusama125718.man10Trophy.Man10Trophy.*;
 
 public class Command implements CommandExecutor, TabCompleter {
@@ -86,6 +97,241 @@ public class Command implements CommandExecutor, TabCompleter {
                     editor = sender.getName();
                     GUI.OpenCreateGUI((Player) sender, args[1]);
                     return true;
+                }
+                if (args[0].equals("title")){
+                    ItemStack item = ((Player) sender).getInventory().getItem(EquipmentSlot.HAND);
+                    if (!item.hasItemMeta() || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING) || ((Player) sender).getUniqueId().toString().equals(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING))){
+                        sender.sendMessage(Component.text(prefix + "そのアイテムは編集できません"));
+                        return true;
+                    }
+                    ItemMeta meta = item.getItemMeta();
+                    meta.displayName(Component.text(args[1]));
+                    item.setItemMeta(meta);
+                    sender.sendMessage(Component.text(prefix + "アイテム名を変更しました"));
+                    return true;
+                }
+                break;
+
+            case 3:
+                if (args[0].equals("lore")) {
+                    ItemStack item = ((Player) sender).getInventory().getItem(EquipmentSlot.HAND);
+                    if (!item.hasItemMeta() || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING) || ((Player) sender).getUniqueId().toString().equals(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING))) {
+                        sender.sendMessage(Component.text(prefix + "そのアイテムは編集できません"));
+                        return true;
+                    }
+                    int row;
+                    try {
+                        row = parseInt(args[1]);
+                    } catch (Exception e) {
+                        sender.sendMessage(Component.text(prefix + "行番号が不正です"));
+                        return true;
+                    }
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta.hasLore()){
+                        List<Component> lore = meta.lore();
+                        if (args[2].equals(":blank")){
+                            lore.remove(row);
+                        }
+                        else {
+                            while (lore.size() < row) {
+                                lore.add(Component.text(""));
+                            }
+                            lore.add(Component.text(args[2]));
+                        }
+                        meta.lore(lore);
+                    }
+                    else {
+                        List<Component> lore = new ArrayList<>();
+                        if (args[2].equals(":blank")){
+                            sender.sendMessage(prefix + "説明が存在しません");
+                        }
+                        else {
+                            while (lore.size() < row) {
+                                lore.add(Component.text(""));
+                            }
+                            lore.add(Component.text(args[2]));
+                        }
+                        meta.lore(lore);
+                    }
+                    item.setItemMeta(meta);
+                    sender.sendMessage(Component.text(prefix + "説明を変更しました"));
+                    return true;
+                }
+                break;
+
+            case 4:
+                if (args[0].equals("editor") && sender.hasPermission("mtro.op")){
+                    if (args[1].equals("score")){
+                        int id;
+                        int score;
+                        try {
+                            id = parseInt(args[2]);
+                            score = parseInt(args[3]);
+                        } catch (Exception e){
+                            sender.sendMessage(Component.text(prefix + "数値が不正です"));
+                            return true;
+                        }
+                        if (trophies.size() - 1 < id){
+                            sender.sendMessage(Component.text(prefix + "指定したトロフィーは存在しません"));
+                            return true;
+                        }
+                        Trophy target = trophies.get(id);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("score", score);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        trophies.get(id).score = score;
+                        sender.sendMessage(Component.text(prefix + "変更しました"));
+                        return true;
+                    }
+                    else if (args[1].equals("display")){
+                        int id;
+                        try {
+                            id = parseInt(args[2]);
+                        } catch (Exception e){
+                            sender.sendMessage(Component.text(prefix + "数値が不正です"));
+                            return true;
+                        }
+                        if (trophies.size() - 1 < id){
+                            sender.sendMessage(Component.text(prefix + "指定したトロフィーは存在しません"));
+                            return true;
+                        }
+                        Trophy target = trophies.get(id);
+                        ItemStack item = target.display;
+                        ItemMeta meta = item.getItemMeta();
+                        meta.displayName(Component.text(args[3]));
+                        item.setItemMeta(meta);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("display", item);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        sender.sendMessage(Component.text(prefix + "変更しました"));
+                        return true;
+                    }
+                    else if (args[1].equals("item")){
+                        int id;
+                        try {
+                            id = parseInt(args[2]);
+                        } catch (Exception e){
+                            sender.sendMessage(Component.text(prefix + "数値が不正です"));
+                            return true;
+                        }
+                        if (trophies.size() - 1 < id){
+                            sender.sendMessage(Component.text(prefix + "指定したトロフィーは存在しません"));
+                            return true;
+                        }
+                        Trophy target = trophies.get(id);
+                        ItemStack item = target.item;
+                        ItemMeta meta = item.getItemMeta();
+                        meta.displayName(Component.text(args[3]));
+                        item.setItemMeta(meta);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("item", item);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        sender.sendMessage(Component.text(prefix + "変更しました"));
+                        return true;
+                    }
+                    else if (args[1].equals("cost")){
+                        int id;
+                        try {
+                            id = parseInt(args[2]);
+                        } catch (Exception e){
+                            sender.sendMessage(Component.text(prefix + "数値が不正です"));
+                            return true;
+                        }
+                        if (trophies.size() - 1 < id){
+                            sender.sendMessage(Component.text(prefix + "指定したトロフィーは存在しません"));
+                            return true;
+                        }
+                        Trophy target = trophies.get(id);
+                        ItemStack item = target.cost;
+                        ItemMeta meta = item.getItemMeta();
+                        meta.displayName(Component.text(args[3]));
+                        item.setItemMeta(meta);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("cost", item);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        sender.sendMessage(Component.text(prefix + "変更しました"));
+                        return true;
+                    }
+                }
+                break;
+
+            case 6:
+                if (sender.hasPermission("mtro.op") && args[0].equals("editor") && args[1].equals("lore")){
+                    if (args[2].equals("display")){
+                        int id;
+                        int row;
+                        try {
+                            id = parseInt(args[3]);
+                            row = parseInt(args[4]);
+                        } catch (Exception e) {
+                            sender.sendMessage(Component.text(prefix + "数字が不正です"));
+                            return true;
+                        }
+                        ItemStack item = trophies.get(id).display;
+                        ItemMeta meta = item.getItemMeta();
+                        if (meta.hasLore()){
+                            List<Component> lore = meta.lore();
+                            if (args[5].equals(":blank")){
+                                lore.remove(row);
+                            }
+                            else {
+                                while (lore.size() < row) {
+                                    lore.add(Component.text(""));
+                                }
+                                lore.add(Component.text(args[5]));
+                            }
+                            meta.lore(lore);
+                        }
+                        else {
+                            List<Component> lore = new ArrayList<>();
+                            if (args[5].equals(":blank")){
+                                sender.sendMessage(prefix + "説明が存在しません");
+                            }
+                            else {
+                                while (lore.size() < row) {
+                                    lore.add(Component.text(""));
+                                }
+                                lore.add(Component.text(args[5]));
+                            }
+                            meta.lore(lore);
+                        }
+                        item.setItemMeta(meta);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("display", item);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        sender.sendMessage(Component.text(prefix + "説明を変更しました"));
+                        return true;
+                    }
                 }
                 break;
         }

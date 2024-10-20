@@ -3,14 +3,17 @@ package yusama125718.man10Trophy;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
 import static yusama125718.man10Trophy.Man10Trophy.trophies;
+import static yusama125718.man10Trophy.Man10Trophy.trophy;
 
 public class GUI {
     // 通常メニュー展開
@@ -43,7 +46,13 @@ public class GUI {
 
                 // 交換元
                 case 11:
-                    inv.setItem(i, t.display.clone());
+                    ItemStack item = t.display.clone();
+                    ItemMeta meta = item.getItemMeta();
+                    byte b = 0;
+                    // 取られても交換に使えないように
+                    meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "mtro"), PersistentDataType.BYTE, b);
+                    item.setItemMeta(meta);
+                    inv.setItem(i, item);
                     break;
 
                 // 矢印
@@ -124,6 +133,11 @@ public class GUI {
                 // display
                 case 29:
                     inv.setItem(i, GetItem(Material.ITEM_FRAME, "アイコンを編集する", 1));
+                    break;
+
+                // score
+                case 33:
+                    inv.setItem(i, GetItem(Material.EMERALD, "スコアを編集する 必要スコア：" + t.score, 1));
                     break;
 
                 // delete

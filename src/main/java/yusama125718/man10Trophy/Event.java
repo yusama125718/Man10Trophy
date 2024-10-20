@@ -9,14 +9,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import red.man10.man10score.ScoreDatabase;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 import static java.lang.Integer.parseInt;
@@ -81,6 +83,13 @@ public class Event implements Listener {
                         e.getWhoClicked().sendMessage(Component.text(prefix + "インベントリがいっぱいです"));
                         e.getWhoClicked().closeInventory();
                         return;
+                    }
+                    if (target.score != 0){
+                        int score =  ScoreDatabase.INSTANCE.getScore(e.getWhoClicked().getUniqueId());
+                        if (score < target.score){
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "スコアが不足しています"));
+                            return;
+                        }
                     }
                     MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
                     if (!mysql.execute("INSERT INTO man10_trophy (time, trophy_name, mcid, uuid) VALUES ('"+ LocalDateTime.now() +", "+ target.name +", "+ e.getWhoClicked().getName() +", "+ e.getWhoClicked().getUniqueId() +"');")){
@@ -158,6 +167,12 @@ public class Event implements Listener {
                     e.getWhoClicked().sendMessage(Component.text(prefix + "販売状態を変更しました。現在の状態：" + target.state));
                     return;
                 }
+                else if (e.getRawSlot() == 33){
+                    e.getWhoClicked().closeInventory();
+                    e.getWhoClicked().sendMessage(Component.text(prefix + "必要を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor score "+ id +" ")));
+                    e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[スコア]を入力で編集"));
+                    return;
+                }
                 else if (e.getRawSlot() == 35){
                     e.getWhoClicked().closeInventory();
                     GUI.OpenDeleteGUI((Player) e.getWhoClicked(), id);
@@ -227,7 +242,7 @@ public class Event implements Listener {
                     case 0:
                         e.setCancelled(true);
                         e.getWhoClicked().closeInventory();
-                        GUI.OpenMenu((Player) e.getWhoClicked(), true, id / 45);
+                        GUI.OpenEditMenu((Player) e.getWhoClicked(), id);
                         return;
 
                     case 12:
@@ -252,6 +267,48 @@ public class Event implements Listener {
                         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
                         config.set("display", e.getInventory().getItem(12));
                         config.save(file);
+                        target.display = e.getInventory().getItem(12);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "変更しました"));
+                        return;
+
+                    default:
+                        e.setCancelled(true);
+                        return;
+                }
+            }
+            else if (e.getView().title().toString().startsWith("[Man10TrophyEdit] アイテム編集 cost ")){
+                int id = parseInt(title.substring(30));
+                Man10Trophy.Trophy target = trophies.get(id);
+                switch(e.getRawSlot()){
+                    case 0:
+                        e.setCancelled(true);
+                        e.getWhoClicked().closeInventory();
+                        GUI.OpenEditMenu((Player) e.getWhoClicked(), id);
+                        return;
+
+                    case 12:
+                        return;
+
+                    case 15:
+                        e.setCancelled(true);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "アイテム名を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor cost "+ id +" ")));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[内容]を入力で編集"));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "アイテム説明を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor lore cost "+ id +" ")));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[行番号 内容]を入力で編集"));
+                        return;
+
+                    case 30:
+                        e.setCancelled(true);
+                        if (e.getInventory().getItem(12) == null){
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "アイテムが不足しています"));
+                            return;
+                        }
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("cost", e.getInventory().getItem(12));
+                        config.save(file);
                         target.cost = e.getInventory().getItem(12);
                         e.getWhoClicked().closeInventory();
                         e.getWhoClicked().sendMessage(Component.text(prefix + "変更しました"));
@@ -262,6 +319,60 @@ public class Event implements Listener {
                         return;
                 }
             }
+            else if (e.getView().title().toString().startsWith("[Man10TrophyEdit] アイテム編集 item ")){
+                int id = parseInt(title.substring(30));
+                Man10Trophy.Trophy target = trophies.get(id);
+                switch(e.getRawSlot()){
+                    case 0:
+                        e.setCancelled(true);
+                        e.getWhoClicked().closeInventory();
+                        GUI.OpenEditMenu((Player) e.getWhoClicked(), id);
+                        return;
+
+                    case 12:
+                        return;
+
+                    case 15:
+                        e.setCancelled(true);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "アイテム名を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor item "+ id +" ")));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[内容]を入力で編集"));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "アイテム説明を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro editor lore item "+ id +" ")));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "↑をクリックして[行番号 内容]を入力で編集"));
+                        return;
+
+                    case 30:
+                        e.setCancelled(true);
+                        if (e.getInventory().getItem(12) == null){
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "アイテムが不足しています"));
+                            return;
+                        }
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("item", e.getInventory().getItem(12));
+                        config.save(file);
+                        target.item = e.getInventory().getItem(12);
+                        e.getWhoClicked().closeInventory();
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "変更しました"));
+                        return;
+
+                    default:
+                        e.setCancelled(true);
+                        return;
+                }
+            }
         }
+    }
+
+    // 右クリックイベント
+    @EventHandler
+    public void PlayerInteractEvent(PlayerInteractEvent e){
+        if (!e.getPlayer().hasPermission("mtro.p") || e.getHand().equals(EquipmentSlot.OFF_HAND) || e.getItem() == null) return;
+        if (!e.getItem().hasItemMeta() || !e.getItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING)) return;
+        if (!e.getItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING).equals(e.getPlayer().getUniqueId().toString())) return;
+        e.getPlayer().sendMessage(Component.text(prefix + "アイテム名を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro title ")));
+        e.getPlayer().sendMessage(Component.text(prefix + "↑をクリックして[内容]を入力で編集"));
+        e.getPlayer().sendMessage(Component.text(prefix + "アイテム説明を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro lore ")));
+        e.getPlayer().sendMessage(Component.text(prefix + "↑をクリックして[行番号 内容]を入力で編集"));
     }
 }
