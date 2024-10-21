@@ -78,7 +78,9 @@
   * display
     * done
   * item
+    * done
   * cost
+    * done
 * /mtro editor score [id] [score] : 要求スコアを設定
   * done
 
@@ -86,4 +88,4 @@
 
 * スコア判定処理を追加
   * done
-* TAB補完の追加
+* テスト仕様書

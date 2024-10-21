@@ -1,6 +1,7 @@
 package yusama125718.man10Trophy;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -91,20 +92,28 @@ public class Event implements Listener {
                             return;
                         }
                     }
-                    MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
-                    if (!mysql.execute("INSERT INTO man10_trophy (time, trophy_name, mcid, uuid) VALUES ('"+ LocalDateTime.now() +", "+ target.name +", "+ e.getWhoClicked().getName() +", "+ e.getWhoClicked().getUniqueId() +"');")){
-                        e.getWhoClicked().sendMessage(Component.text(prefix + "DBの保存に失敗しました"));
-                        e.getWhoClicked().closeInventory();
+                    Thread th = new Thread(() -> {
+                        MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
+                        if (!mysql.execute("INSERT INTO man10_trophy (time, trophy_name, mcid, uuid) VALUES ('" + LocalDateTime.now() + ", " + target.name + ", " + e.getWhoClicked().getName() + ", " + e.getWhoClicked().getUniqueId() + "');")) {
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "DBの保存に失敗しました"));
+                            e.getWhoClicked().closeInventory();
+                            return;
+                        }
+                        Bukkit.getScheduler().runTask(trophy, () -> {
+                            e.getWhoClicked().getInventory().removeItemAnySlot(target.cost);
+                            ItemStack item = target.item.clone();
+                            ItemMeta meta = item.getItemMeta();
+                            meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING, e.getWhoClicked().getUniqueId().toString());
+                            item.setItemMeta(meta);
+                            e.getWhoClicked().getInventory().addItem(item);
+                        });
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "交換しました"));
                         return;
-                    }
-                    e.getWhoClicked().getInventory().removeItemAnySlot(target.cost);
-                    ItemStack item = target.item.clone();
-                    ItemMeta meta = item.getItemMeta();
-                    meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING, e.getWhoClicked().getUniqueId().toString());
-                    item.setItemMeta(meta);
-                    e.getWhoClicked().getInventory().addItem(item);
-                    e.getWhoClicked().sendMessage(Component.text(prefix + "交換しました"));
-                    return;
+                    });
+                    th.start();
+                    try {
+                        th.join();
+                    } catch (InterruptedException ignored) {}
                 }
                 else if (e.getRawSlot() == 0){
                     e.getWhoClicked().closeInventory();

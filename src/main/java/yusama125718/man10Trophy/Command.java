@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -280,8 +281,8 @@ public class Command implements CommandExecutor, TabCompleter {
                 break;
 
             case 6:
-                if (sender.hasPermission("mtro.op") && args[0].equals("editor") && args[1].equals("lore")){
-                    if (args[2].equals("display")){
+                if (sender.hasPermission("mtro.op") && args[0].equals("editor") && args[1].equals("lore")) {
+                    if (args[2].equals("display")) {
                         int id;
                         int row;
                         try {
@@ -291,7 +292,57 @@ public class Command implements CommandExecutor, TabCompleter {
                             sender.sendMessage(Component.text(prefix + "数字が不正です"));
                             return true;
                         }
-                        ItemStack item = trophies.get(id).display;
+                        Trophy target = trophies.get(id);
+                        ItemStack item = target.display;
+                        ItemMeta meta = item.getItemMeta();
+                        if (meta.hasLore()) {
+                            List<Component> lore = meta.lore();
+                            if (args[5].equals(":blank")) {
+                                lore.remove(row);
+                            } else {
+                                while (lore.size() < row) {
+                                    lore.add(Component.text(""));
+                                }
+                                lore.add(Component.text(args[5]));
+                            }
+                            meta.lore(lore);
+                        } else {
+                            List<Component> lore = new ArrayList<>();
+                            if (args[5].equals(":blank")) {
+                                sender.sendMessage(prefix + "説明が存在しません");
+                            } else {
+                                while (lore.size() < row) {
+                                    lore.add(Component.text(""));
+                                }
+                                lore.add(Component.text(args[5]));
+                            }
+                            meta.lore(lore);
+                        }
+                        item.setItemMeta(meta);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("display", item);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        sender.sendMessage(Component.text(prefix + "説明を変更しました"));
+                        return true;
+                    }
+                    else if (args[2].equals("item")){
+                        int id;
+                        int row;
+                        try {
+                            id = parseInt(args[3]);
+                            row = parseInt(args[4]);
+                        } catch (Exception e) {
+                            sender.sendMessage(Component.text(prefix + "数字が不正です"));
+                            return true;
+                        }
+                        Trophy target = trophies.get(id);
+                        ItemStack item = target.item;
                         ItemMeta meta = item.getItemMeta();
                         if (meta.hasLore()){
                             List<Component> lore = meta.lore();
@@ -322,7 +373,59 @@ public class Command implements CommandExecutor, TabCompleter {
                         item.setItemMeta(meta);
                         File file = new File(configfile + File.separator + target.name);
                         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-                        config.set("display", item);
+                        config.set("item", item);
+                        try {
+                            config.save(file);
+                        } catch (IOException e) {
+                            sender.sendMessage(Component.text(prefix + "保存に失敗しました"));
+                            return true;
+                        }
+                        sender.sendMessage(Component.text(prefix + "説明を変更しました"));
+                        return true;
+                    }
+                    else if (args[2].equals("cost")){
+                        int id;
+                        int row;
+                        try {
+                            id = parseInt(args[3]);
+                            row = parseInt(args[4]);
+                        } catch (Exception e) {
+                            sender.sendMessage(Component.text(prefix + "数字が不正です"));
+                            return true;
+                        }
+                        Trophy target = trophies.get(id);
+                        ItemStack item = target.cost;
+                        ItemMeta meta = item.getItemMeta();
+                        if (meta.hasLore()){
+                            List<Component> lore = meta.lore();
+                            if (args[5].equals(":blank")){
+                                lore.remove(row);
+                            }
+                            else {
+                                while (lore.size() < row) {
+                                    lore.add(Component.text(""));
+                                }
+                                lore.add(Component.text(args[5]));
+                            }
+                            meta.lore(lore);
+                        }
+                        else {
+                            List<Component> lore = new ArrayList<>();
+                            if (args[5].equals(":blank")){
+                                sender.sendMessage(prefix + "説明が存在しません");
+                            }
+                            else {
+                                while (lore.size() < row) {
+                                    lore.add(Component.text(""));
+                                }
+                                lore.add(Component.text(args[5]));
+                            }
+                            meta.lore(lore);
+                        }
+                        item.setItemMeta(meta);
+                        File file = new File(configfile + File.separator + target.name);
+                        YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+                        config.set("cost", item);
                         try {
                             config.save(file);
                         } catch (IOException e) {
@@ -333,6 +436,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         return true;
                     }
                 }
+
                 break;
         }
         sender.sendMessage(Component.text(prefix + "/mtro help でhelpを表示"));
@@ -341,7 +445,12 @@ public class Command implements CommandExecutor, TabCompleter {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (!sender.hasPermission("mtro.p")) return null;
+        if (!sender.hasPermission("mtro.p")) {
+            switch (args.length){
+                case 1:
+                    if (args[0].isEmpty() && sender.hasPermission("mtro.op")) return Arrays.asList("edit", "create");
+            }
+        }
         return null;
     }
 }
