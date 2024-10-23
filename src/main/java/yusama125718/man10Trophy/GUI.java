@@ -27,7 +27,7 @@ public class GUI {
             inv.setItem(i - 3,GetItem(Material.WHITE_STAINED_GLASS_PANE, "",1));
             inv.setItem(i - 6,GetItem(Material.RED_STAINED_GLASS_PANE, "前のページへ",1));
         }
-        for (int i = 0; (i <= 45 || trophies.size() >= i + 45 * (page - 1)); i++){
+        for (int i = 0; (i < 45 && trophies.size() > i + 45 * (page - 1)); i++){
             inv.setItem(i, trophies.get(i + 45 * (page - 1)).display.clone());
         }
         p.openInventory(inv);
@@ -36,7 +36,7 @@ public class GUI {
     // 通常メニュー交換画面
     public static void OpenTradeMenu(Player p, Integer index){
         Man10Trophy.Trophy t = trophies.get(index);
-        Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10Trophy] 交換画面 " + t.name));
+        Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10Trophy] 交換画面 " + index));
         for (int i = 0; i < 36; i++){
             switch (i){
                 // 戻る
@@ -46,7 +46,7 @@ public class GUI {
 
                 // 交換元
                 case 11:
-                    ItemStack item = t.display.clone();
+                    ItemStack item = t.cost.clone();
                     ItemMeta meta = item.getItemMeta();
                     byte b = 0;
                     // 取られても交換に使えないように
@@ -93,7 +93,7 @@ public class GUI {
 
                 // 交換元
                 case 11:
-                    ItemStack item = t.display.clone();
+                    ItemStack item = t.cost.clone();
                     ItemMeta meta = item.getItemMeta();
                     if(meta.hasLore()) meta.lore().add(Component.text("[クリックで編集]"));
                     else {
@@ -158,11 +158,6 @@ public class GUI {
         Inventory inv = Bukkit.createInventory(null,36, Component.text("[Man10TrophyEdit] 新規作成 " + name));
         for (int i = 0; i < 36; i++){
             switch (i){
-                // 戻る
-                case 0:
-                    inv.setItem(i, GetItem(Material.BLACK_STAINED_GLASS_PANE, "戻る",1));
-                    break;
-
                 // 交換元、交換先
                 case 11, 15:
                     break;

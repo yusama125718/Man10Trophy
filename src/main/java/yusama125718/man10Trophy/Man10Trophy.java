@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ public final class Man10Trophy extends JavaPlugin {
     @Override
     public void onEnable() {
         trophy = this;
+        trophies = new ArrayList<>();
         folder = new File(trophy.getDataFolder().getAbsolutePath() + File.separator + "trophy");
         new Event(this);
         getCommand("mtro").setExecutor(new Command());
@@ -59,11 +61,11 @@ public final class Man10Trophy extends JavaPlugin {
         if (configfile.listFiles() != null){
             for (File file : configfile.listFiles()){
                 YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
-                if (config.isItemStack("item") || config.isItemStack("cost") || config.isItemStack("display") || config.isInt("score") || config.isBoolean("state")){
+                if (!config.isItemStack("item") || !config.isItemStack("cost") || !config.isItemStack("display") || !config.isInt("score") || !config.isBoolean("state")){
                     Bukkit.broadcast(Component.text(prefix + file.getName() + "の読み込みに失敗しました"), "mtro.op");
                     continue;
                 }
-                trophies.add(new Trophy(config.getItemStack("item"), config.getItemStack("cost"), config.getItemStack("display"), config.getInt("score"), config.getBoolean("state"), folder.getName()));
+                trophies.add(new Trophy(config.getItemStack("item"), config.getItemStack("cost"), config.getItemStack("display"), config.getInt("score"), config.getBoolean("state"), file.getName()));
             }
         }
     }

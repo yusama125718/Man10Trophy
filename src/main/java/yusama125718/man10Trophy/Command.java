@@ -65,6 +65,7 @@ public class Command implements CommandExecutor, TabCompleter {
                     trophy.getConfig().set("system", system);
                     trophy.saveConfig();
                     sender.sendMessage(Component.text(prefix + "システムを有効にしました"));
+                    return true;
                 }
                 else if(sender.hasPermission("mtro.op") && args[0].equals("off")){
                     if(!system){
@@ -75,6 +76,7 @@ public class Command implements CommandExecutor, TabCompleter {
                     trophy.getConfig().set("system", system);
                     trophy.saveConfig();
                     sender.sendMessage(Component.text(prefix + "システムを無効にしました"));
+                    return true;
                 }
                 else if(sender.hasPermission("mtro.op") && args[0].equals("edit")){
                     if(trophies.isEmpty()){
@@ -90,7 +92,11 @@ public class Command implements CommandExecutor, TabCompleter {
             case 2:
                 if (sender.hasPermission("mtro.op") && args[0].equals("create")){
                     for(Trophy t: trophies){
-                        if(t.name.equals(args[1])){
+                        if((args[1] + ".yml").length() < 20){
+                            sender.sendMessage(Component.text(prefix + "16文字以内で指定してください"));
+                            return true;
+                        }
+                        if(t.name.equals(args[1] + ".yml")){
                             sender.sendMessage(Component.text(prefix + args[1] + "は既に存在しています"));
                             return true;
                         }
@@ -101,7 +107,7 @@ public class Command implements CommandExecutor, TabCompleter {
                 }
                 if (args[0].equals("title")){
                     ItemStack item = ((Player) sender).getInventory().getItem(EquipmentSlot.HAND);
-                    if (!item.hasItemMeta() || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING) || ((Player) sender).getUniqueId().toString().equals(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING))){
+                    if (!item.hasItemMeta() || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING) || !((Player) sender).getUniqueId().toString().equals(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING))){
                         sender.sendMessage(Component.text(prefix + "そのアイテムは編集できません"));
                         return true;
                     }
@@ -116,7 +122,7 @@ public class Command implements CommandExecutor, TabCompleter {
             case 3:
                 if (args[0].equals("lore")) {
                     ItemStack item = ((Player) sender).getInventory().getItem(EquipmentSlot.HAND);
-                    if (!item.hasItemMeta() || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING) || ((Player) sender).getUniqueId().toString().equals(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING))) {
+                    if (!item.hasItemMeta() || !item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING) || !((Player) sender).getUniqueId().toString().equals(item.getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING))) {
                         sender.sendMessage(Component.text(prefix + "そのアイテムは編集できません"));
                         return true;
                     }
@@ -446,9 +452,8 @@ public class Command implements CommandExecutor, TabCompleter {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, org.bukkit.command.@NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (!sender.hasPermission("mtro.p")) {
-            switch (args.length){
-                case 1:
-                    if (args[0].isEmpty() && sender.hasPermission("mtro.op")) return Arrays.asList("edit", "create");
+            if (args.length == 1) {
+                if (args[0].isEmpty() && sender.hasPermission("mtro.op")) return Arrays.asList("edit", "create");
             }
         }
         return null;

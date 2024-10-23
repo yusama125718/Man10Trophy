@@ -1,6 +1,7 @@
 package yusama125718.man10Trophy;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -33,7 +34,9 @@ public class Event implements Listener {
 
     @EventHandler
     public void GUIClick(InventoryClickEvent e) throws IOException {
-        String title = e.getView().toString();
+        Component component = e.getView().title();
+        String title = "";
+        if (component instanceof TextComponent text) title = text.content();
         if (title.startsWith("[Man10Trophy]")){
             if (e.getClick().equals(ClickType.NUMBER_KEY) || e.getClick().equals(ClickType.SWAP_OFFHAND)){
                 e.setCancelled(true);
@@ -56,7 +59,7 @@ public class Event implements Listener {
                     return;
                 }
                 if (e.getRawSlot() < 45 && e.getCurrentItem() != null){
-                    int index = 45 * page + e.getRawSlot();
+                    int index = 45 * (page - 1) + e.getRawSlot();
                     if (trophies.size() > index) GUI.OpenTradeMenu((Player) e.getWhoClicked(), index);
                     return;
                 }
@@ -75,7 +78,7 @@ public class Event implements Listener {
                         e.getWhoClicked().closeInventory();
                         return;
                     }
-                    if (!e.getWhoClicked().getInventory().contains(target.cost, target.cost.getAmount())){
+                    if (!e.getWhoClicked().getInventory().containsAtLeast(target.cost, target.cost.getAmount())){
                         e.getWhoClicked().sendMessage(Component.text(prefix + "アイテムが不足しています"));
                         e.getWhoClicked().closeInventory();
                         return;
@@ -94,7 +97,7 @@ public class Event implements Listener {
                     }
                     Thread th = new Thread(() -> {
                         MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
-                        if (!mysql.execute("INSERT INTO man10_trophy (time, trophy_name, mcid, uuid) VALUES ('" + LocalDateTime.now() + ", " + target.name + ", " + e.getWhoClicked().getName() + ", " + e.getWhoClicked().getUniqueId() + "');")) {
+                        if (!mysql.execute("INSERT INTO man10_trophy.man10_trophy_data (time, trophy_name, mcid, uuid) VALUES ('" + LocalDateTime.now() + "', '" + target.name + "', '" + e.getWhoClicked().getName() + "', '" + e.getWhoClicked().getUniqueId() + "');")) {
                             e.getWhoClicked().sendMessage(Component.text(prefix + "DBの保存に失敗しました"));
                             e.getWhoClicked().closeInventory();
                             return;
@@ -103,7 +106,7 @@ public class Event implements Listener {
                             e.getWhoClicked().getInventory().removeItemAnySlot(target.cost);
                             ItemStack item = target.item.clone();
                             ItemMeta meta = item.getItemMeta();
-                            meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING, e.getWhoClicked().getUniqueId().toString());
+                                            meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING, e.getWhoClicked().getUniqueId().toString());
                             item.setItemMeta(meta);
                             e.getWhoClicked().getInventory().addItem(item);
                         });
@@ -117,7 +120,7 @@ public class Event implements Listener {
                 }
                 else if (e.getRawSlot() == 0){
                     e.getWhoClicked().closeInventory();
-                    GUI.OpenMenu((Player) e.getWhoClicked(), false, id / 45);
+                    GUI.OpenMenu((Player) e.getWhoClicked(), false, (id + 46) / 45);
                     return;
                 }
             }
@@ -127,13 +130,16 @@ public class Event implements Listener {
                     if (trophies.size() > 45 * page) GUI.OpenMenu((Player) e.getWhoClicked(), true,page + 1);
                     return;
                 }
-                if (45 <= e.getRawSlot() && e.getRawSlot() <= 47){     //前のページへ
+                else if (45 <= e.getRawSlot() && e.getRawSlot() <= 47){     //前のページへ
                     if (page != 1) GUI.OpenMenu((Player) e.getWhoClicked(), true, page - 1);
                     return;
                 }
-                if (e.getRawSlot() < 45 && e.getCurrentItem() != null){
-                    int index = 45 * page + e.getRawSlot();
-                    if (trophies.size() > index) GUI.OpenEditMenu((Player) e.getWhoClicked(), index);
+                else if (e.getRawSlot() < 45 && e.getCurrentItem() != null){
+                    int index = 45 * (page - 1) + e.getRawSlot();
+                    if (trophies.size() > index) {
+                        e.getWhoClicked().closeInventory();
+                        GUI.OpenEditMenu((Player) e.getWhoClicked(), index);
+                    }
                     return;
                 }
             }
@@ -142,7 +148,7 @@ public class Event implements Listener {
                 Man10Trophy.Trophy target = trophies.get(id);
                 if (e.getRawSlot() == 0){
                     e.getWhoClicked().closeInventory();
-                    GUI.OpenMenu((Player) e.getWhoClicked(), true, id / 45);
+                    GUI.OpenMenu((Player) e.getWhoClicked(), true, (id + 46) / 45);
                     return;
                 }
                 else if (e.getRawSlot() == 11) {
@@ -210,7 +216,9 @@ public class Event implements Listener {
                 }
             }
         }
-        else if (e.getView().title().toString().startsWith("[Man10TrophyEdit]")){
+        else if (title.startsWith("[Man10TrophyEdit]")){
+            if (e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta() || !e.getCurrentItem().getItemMeta().hasCustomModelData() || e.getCurrentItem().getItemMeta().getCustomModelData() != 1) return;
+            if (e.getCurrentItem().getType().equals(Material.QUARTZ) && e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasCustomModelData() && e.getCurrentItem().getItemMeta().getCustomModelData() == 62) return;
             if (e.getClick().equals(ClickType.NUMBER_KEY) || e.getClick().equals(ClickType.SWAP_OFFHAND)){
                 e.setCancelled(true);
                 return;
@@ -236,7 +244,9 @@ public class Event implements Listener {
                         yml.set("score", 0);
                         yml.set("state", false);
                         yml.save(folder);
-                        trophies.add(new Trophy(inv.getItem(15), inv.getItem(11), inv.getItem(15), 0, false, name));
+                        trophies.add(new Trophy(inv.getItem(15), inv.getItem(11), inv.getItem(15), 0, false, name + ".yml"));
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "作成しました"));
+                        e.getWhoClicked().closeInventory();
                         return;
 
                     default:
@@ -244,7 +254,7 @@ public class Event implements Listener {
                         return;
                 }
             }
-            else if (e.getView().title().toString().startsWith("[Man10TrophyEdit] アイテム編集 display ")){
+            else if (title.startsWith("[Man10TrophyEdit] アイテム編集 display ")){
                 int id = parseInt(title.substring(33));
                 Man10Trophy.Trophy target = trophies.get(id);
                 switch(e.getRawSlot()){
@@ -286,7 +296,7 @@ public class Event implements Listener {
                         return;
                 }
             }
-            else if (e.getView().title().toString().startsWith("[Man10TrophyEdit] アイテム編集 cost ")){
+            else if (title.startsWith("[Man10TrophyEdit] アイテム編集 cost ")){
                 int id = parseInt(title.substring(30));
                 Man10Trophy.Trophy target = trophies.get(id);
                 switch(e.getRawSlot()){
@@ -328,7 +338,7 @@ public class Event implements Listener {
                         return;
                 }
             }
-            else if (e.getView().title().toString().startsWith("[Man10TrophyEdit] アイテム編集 item ")){
+            else if (title.startsWith("[Man10TrophyEdit] アイテム編集 item ")){
                 int id = parseInt(title.substring(30));
                 Man10Trophy.Trophy target = trophies.get(id);
                 switch(e.getRawSlot()){
