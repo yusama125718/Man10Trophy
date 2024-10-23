@@ -88,12 +88,10 @@ public class Event implements Listener {
                         e.getWhoClicked().closeInventory();
                         return;
                     }
-                    if (target.score != 0){
-                        int score =  ScoreDatabase.INSTANCE.getScore(e.getWhoClicked().getUniqueId());
-                        if (score < target.score){
-                            e.getWhoClicked().sendMessage(Component.text(prefix + "スコアが不足しています"));
-                            return;
-                        }
+                    int score =  ScoreDatabase.INSTANCE.getScore(e.getWhoClicked().getUniqueId());
+                    if (score < target.score){
+                        e.getWhoClicked().sendMessage(Component.text(prefix + "スコアが不足しています"));
+                        return;
                     }
                     Thread th = new Thread(() -> {
                         MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
@@ -106,7 +104,7 @@ public class Event implements Listener {
                             e.getWhoClicked().getInventory().removeItemAnySlot(target.cost);
                             ItemStack item = target.item.clone();
                             ItemMeta meta = item.getItemMeta();
-                                            meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING, e.getWhoClicked().getUniqueId().toString());
+                            meta.getPersistentDataContainer().set(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING, e.getWhoClicked().getUniqueId().toString());
                             item.setItemMeta(meta);
                             e.getWhoClicked().getInventory().addItem(item);
                         });
