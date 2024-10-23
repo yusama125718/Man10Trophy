@@ -52,6 +52,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         sender.sendMessage(Component.text(prefix + "§8/mtro create [内部名] §7: §rトロフィー交換メニューを開きます"));
                         sender.sendMessage(Component.text(prefix + "§8/mtro edit §7: §rトロフィー編集メニューを開きます"));
                         sender.sendMessage(Component.text("=========================="));
+                        sender.sendMessage(Component.text("※編集系コマンドはシステムをOFFにしてから行ってください"));
                         sender.sendMessage(Component.text(prefix + "システム：" + system));
                     }
                     return true;
@@ -79,6 +80,10 @@ public class Command implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 else if(sender.hasPermission("mtro.op") && args[0].equals("edit")){
+                    if(system){
+                        sender.sendMessage(Component.text(prefix + "システムを無効にしてから実施してください"));
+                        return true;
+                    }
                     if(trophies.isEmpty()){
                         sender.sendMessage(Component.text(prefix + "トロフィーが1つも登録されていません"));
                         return true;
@@ -168,6 +173,10 @@ public class Command implements CommandExecutor, TabCompleter {
 
             case 4:
                 if (args[0].equals("editor") && sender.hasPermission("mtro.op")){
+                    if(system){
+                        sender.sendMessage(Component.text(prefix + "システムを無効にしてから実施してください"));
+                        return true;
+                    }
                     if (args[1].equals("score")){
                         int id;
                         int score;
@@ -288,6 +297,10 @@ public class Command implements CommandExecutor, TabCompleter {
 
             case 6:
                 if (sender.hasPermission("mtro.op") && args[0].equals("editor") && args[1].equals("lore")) {
+                    if(system){
+                        sender.sendMessage(Component.text(prefix + "システムを無効にしてから実施してください"));
+                        return true;
+                    }
                     if (args[2].equals("display")) {
                         int id;
                         int row;
