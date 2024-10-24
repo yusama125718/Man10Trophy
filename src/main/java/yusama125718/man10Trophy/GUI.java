@@ -112,7 +112,7 @@ public class GUI {
 
                 // 交換先
                 case 15:
-                    ItemStack d_item = t.display.clone();
+                    ItemStack d_item = t.item.clone();
                     ItemMeta d_meta = d_item.getItemMeta();
                     if(d_meta.hasLore()) d_meta.lore().add(Component.text("[クリックで編集]"));
                     else {
