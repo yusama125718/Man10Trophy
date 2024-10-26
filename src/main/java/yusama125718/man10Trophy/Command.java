@@ -96,11 +96,11 @@ public class Command implements CommandExecutor, TabCompleter {
 
             case 2:
                 if (sender.hasPermission("mtro.op") && args[0].equals("create")){
+                    if((args[1] + ".yml").length() > 20){
+                        sender.sendMessage(Component.text(prefix + "16文字以内で指定してください"));
+                        return true;
+                    }
                     for(Trophy t: trophies){
-                        if((args[1] + ".yml").length() < 20){
-                            sender.sendMessage(Component.text(prefix + "16文字以内で指定してください"));
-                            return true;
-                        }
                         if(t.name.equals(args[1] + ".yml")){
                             sender.sendMessage(Component.text(prefix + args[1] + "は既に存在しています"));
                             return true;
@@ -141,10 +141,12 @@ public class Command implements CommandExecutor, TabCompleter {
                     ItemMeta meta = item.getItemMeta();
                     if (meta.hasLore()){
                         List<Component> lore = meta.lore();
-                        if (args[2].equals(":blank")){
+                        if (args[2].equals(":blank")) {
                             lore.remove(row);
                         }
-                        else {
+                        else if(lore.size() > row){
+                            lore.set(row, Component.text(args[2]));
+                        } else {
                             while (lore.size() < row) {
                                 lore.add(Component.text(""));
                             }
@@ -318,6 +320,9 @@ public class Command implements CommandExecutor, TabCompleter {
                             List<Component> lore = meta.lore();
                             if (args[5].equals(":blank")) {
                                 lore.remove(row);
+                            }
+                            else if(lore.size() > row){
+                                lore.set(row, Component.text(args[5]));
                             } else {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
@@ -365,10 +370,12 @@ public class Command implements CommandExecutor, TabCompleter {
                         ItemMeta meta = item.getItemMeta();
                         if (meta.hasLore()){
                             List<Component> lore = meta.lore();
-                            if (args[5].equals(":blank")){
+                            if (args[5].equals(":blank")) {
                                 lore.remove(row);
                             }
-                            else {
+                            else if(lore.size() > row){
+                                lore.set(row, Component.text(args[5]));
+                            } else {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
@@ -417,10 +424,12 @@ public class Command implements CommandExecutor, TabCompleter {
                         ItemMeta meta = item.getItemMeta();
                         if (meta.hasLore()){
                             List<Component> lore = meta.lore();
-                            if (args[5].equals(":blank")){
+                            if (args[5].equals(":blank")) {
                                 lore.remove(row);
                             }
-                            else {
+                            else if(lore.size() > row){
+                                lore.set(row, Component.text(args[5]));
+                            } else {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }

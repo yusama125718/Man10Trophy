@@ -10,5 +10,5 @@ commands:
 permissions:
   mtro.op:
     default: op
-  mtro.player:
+  mtro.p:
     default: true
