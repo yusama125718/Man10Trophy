@@ -95,7 +95,7 @@ public class Event implements Listener {
                     }
                     Thread th = new Thread(() -> {
                         MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
-                        if (!mysql.execute("INSERT INTO man10_trophy.man10_trophy_data (time, trophy_name, mcid, uuid) VALUES ('" + LocalDateTime.now() + "', '" + target.name + "', '" + e.getWhoClicked().getName() + "', '" + e.getWhoClicked().getUniqueId() + "');")) {
+                        if (!mysql.execute("INSERT INTO man10_trophy_data (time, trophy_name, mcid, uuid) VALUES ('" + LocalDateTime.now() + "', '" + target.name + "', '" + e.getWhoClicked().getName() + "', '" + e.getWhoClicked().getUniqueId() + "');")) {
                             e.getWhoClicked().sendMessage(Component.text(prefix + "DBの保存に失敗しました"));
                             e.getWhoClicked().closeInventory();
                             return;
