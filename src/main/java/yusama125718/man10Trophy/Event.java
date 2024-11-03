@@ -88,12 +88,12 @@ public class Event implements Listener {
                         e.getWhoClicked().closeInventory();
                         return;
                     }
-                    int score =  ScoreDatabase.INSTANCE.getScore(e.getWhoClicked().getUniqueId());
-                    if (score < target.score){
-                        e.getWhoClicked().sendMessage(Component.text(prefix + "スコアが不足しています"));
-                        return;
-                    }
                     Thread th = new Thread(() -> {
+                        int score =  ScoreDatabase.INSTANCE.getScore(e.getWhoClicked().getUniqueId());
+                        if (score < target.score){
+                            e.getWhoClicked().sendMessage(Component.text(prefix + "スコアが不足しています"));
+                            return;
+                        }
                         MySQLManager mysql = new MySQLManager(trophy, "man10_trophy");
                         if (!mysql.execute("INSERT INTO man10_trophy_data (time, trophy_name, mcid, uuid) VALUES ('" + LocalDateTime.now() + "', '" + target.name + "', '" + e.getWhoClicked().getName() + "', '" + e.getWhoClicked().getUniqueId() + "');")) {
                             e.getWhoClicked().sendMessage(Component.text(prefix + "DBの保存に失敗しました"));
@@ -112,9 +112,6 @@ public class Event implements Listener {
                         return;
                     });
                     th.start();
-                    try {
-                        th.join();
-                    } catch (InterruptedException ignored) {}
                 }
                 else if (e.getRawSlot() == 0){
                     e.getWhoClicked().closeInventory();

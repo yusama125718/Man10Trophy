@@ -117,7 +117,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         return true;
                     }
                     ItemMeta meta = item.getItemMeta();
-                    meta.displayName(Component.text(args[1]));
+                    meta.displayName(Component.text(ConvertString(args[1])));
                     item.setItemMeta(meta);
                     sender.sendMessage(Component.text(prefix + "アイテム名を変更しました"));
                     return true;
@@ -145,12 +145,12 @@ public class Command implements CommandExecutor, TabCompleter {
                             lore.remove(row);
                         }
                         else if(lore.size() > row){
-                            lore.set(row, Component.text(args[2]));
+                            lore.set(row, Component.text(ConvertString(args[2])));
                         } else {
                             while (lore.size() < row) {
                                 lore.add(Component.text(""));
                             }
-                            lore.add(Component.text(args[2]));
+                            lore.add(Component.text(ConvertString(args[2])));
                         }
                         meta.lore(lore);
                     }
@@ -163,7 +163,7 @@ public class Command implements CommandExecutor, TabCompleter {
                             while (lore.size() < row) {
                                 lore.add(Component.text(""));
                             }
-                            lore.add(Component.text(args[2]));
+                            lore.add(Component.text(ConvertString(args[2])));
                         }
                         meta.lore(lore);
                     }
@@ -222,7 +222,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         Trophy target = trophies.get(id);
                         ItemStack item = target.display;
                         ItemMeta meta = item.getItemMeta();
-                        meta.displayName(Component.text(args[3]));
+                        meta.displayName(Component.text(ConvertString(args[3])));
                         item.setItemMeta(meta);
                         File file = new File(configfile + File.separator + target.name);
                         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -251,7 +251,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         Trophy target = trophies.get(id);
                         ItemStack item = target.item;
                         ItemMeta meta = item.getItemMeta();
-                        meta.displayName(Component.text(args[3]));
+                        meta.displayName(Component.text(ConvertString(args[3])));
                         item.setItemMeta(meta);
                         File file = new File(configfile + File.separator + target.name);
                         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -280,7 +280,7 @@ public class Command implements CommandExecutor, TabCompleter {
                         Trophy target = trophies.get(id);
                         ItemStack item = target.cost;
                         ItemMeta meta = item.getItemMeta();
-                        meta.displayName(Component.text(args[3]));
+                        meta.displayName(Component.text(ConvertString(args[3])));
                         item.setItemMeta(meta);
                         File file = new File(configfile + File.separator + target.name);
                         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -322,12 +322,12 @@ public class Command implements CommandExecutor, TabCompleter {
                                 lore.remove(row);
                             }
                             else if(lore.size() > row){
-                                lore.set(row, Component.text(args[5]));
+                                lore.set(row, Component.text(ConvertString(args[5])));
                             } else {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
-                                lore.add(Component.text(args[5]));
+                                lore.add(Component.text(ConvertString(args[5])));
                             }
                             meta.lore(lore);
                         } else {
@@ -338,7 +338,7 @@ public class Command implements CommandExecutor, TabCompleter {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
-                                lore.add(Component.text(args[5]));
+                                lore.add(Component.text(ConvertString(args[5])));
                             }
                             meta.lore(lore);
                         }
@@ -374,12 +374,12 @@ public class Command implements CommandExecutor, TabCompleter {
                                 lore.remove(row);
                             }
                             else if(lore.size() > row){
-                                lore.set(row, Component.text(args[5]));
+                                lore.set(row, Component.text(ConvertString(args[5])));
                             } else {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
-                                lore.add(Component.text(args[5]));
+                                lore.add(Component.text(ConvertString(args[5])));
                             }
                             meta.lore(lore);
                         }
@@ -392,7 +392,7 @@ public class Command implements CommandExecutor, TabCompleter {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
-                                lore.add(Component.text(args[5]));
+                                lore.add(Component.text(ConvertString(args[5])));
                             }
                             meta.lore(lore);
                         }
@@ -428,12 +428,12 @@ public class Command implements CommandExecutor, TabCompleter {
                                 lore.remove(row);
                             }
                             else if(lore.size() > row){
-                                lore.set(row, Component.text(args[5]));
+                                lore.set(row, Component.text(ConvertString(args[5])));
                             } else {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
-                                lore.add(Component.text(args[5]));
+                                lore.add(Component.text(ConvertString(args[5])));
                             }
                             meta.lore(lore);
                         }
@@ -446,7 +446,7 @@ public class Command implements CommandExecutor, TabCompleter {
                                 while (lore.size() < row) {
                                     lore.add(Component.text(""));
                                 }
-                                lore.add(Component.text(args[5]));
+                                lore.add(Component.text(ConvertString(args[5])));
                             }
                             meta.lore(lore);
                         }
@@ -479,5 +479,9 @@ public class Command implements CommandExecutor, TabCompleter {
             }
         }
         return null;
+    }
+
+    private static String ConvertString(String s){
+        return s.replace("&", "§");
     }
 }
