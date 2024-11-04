@@ -212,9 +212,12 @@ public class Event implements Listener {
             }
         }
         else if (title.startsWith("[Man10TrophyEdit]")){
+            if (e.getCurrentItem().getType().equals(Material.QUARTZ) && e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasCustomModelData() && e.getCurrentItem().getItemMeta().getCustomModelData() == 62){
+                e.setCancelled(true);
+                return;
+            }
             if ((e.getCurrentItem() == null || !e.getCurrentItem().hasItemMeta() || !e.getCurrentItem().getItemMeta().hasCustomModelData() || e.getCurrentItem().getItemMeta().getCustomModelData() != 1)
-                    && (e.getCurrentItem().equals(Material.EMERALD_BLOCK) || e.getCurrentItem().equals(Material.WHITE_STAINED_GLASS_PANE))) return;
-            if (e.getCurrentItem().getType().equals(Material.QUARTZ) && e.getCurrentItem().hasItemMeta() && e.getCurrentItem().getItemMeta().hasCustomModelData() && e.getCurrentItem().getItemMeta().getCustomModelData() == 62) return;
+                    || (!e.getCurrentItem().getType().equals(Material.EMERALD_BLOCK) && !e.getCurrentItem().getType().equals(Material.WHITE_STAINED_GLASS_PANE))) return;
             if (e.getClick().equals(ClickType.NUMBER_KEY) || e.getClick().equals(ClickType.SWAP_OFFHAND)){
                 e.setCancelled(true);
                 return;
