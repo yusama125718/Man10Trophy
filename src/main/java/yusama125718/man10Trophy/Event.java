@@ -385,7 +385,7 @@ public class Event implements Listener {
     // 右クリックイベント
     @EventHandler
     public void PlayerInteractEvent(PlayerInteractEvent e){
-        if (!e.getPlayer().hasPermission("mtro.p") || e.getHand().equals(EquipmentSlot.OFF_HAND) || e.getItem() == null) return;
+        if (!e.getPlayer().hasPermission("mtro.p") || e.getHand() == null || e.getHand().equals(EquipmentSlot.OFF_HAND) || e.getItem() == null) return;
         if (!e.getItem().hasItemMeta() || !e.getItem().getItemMeta().getPersistentDataContainer().has(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING)) return;
         if (!e.getItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(trophy, "Man10Trophy"), PersistentDataType.STRING).equals(e.getPlayer().getUniqueId().toString())) return;
         e.getPlayer().sendMessage(Component.text(prefix + "アイテム名を編集する§e§l[ここをクリックで自動入力する]").clickEvent(suggestCommand("/mtro title ")));
